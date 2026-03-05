@@ -1,0 +1,35 @@
+---
+import Page from "../layouts/Page.astro";
+---
+
+<Page title="Work">
+  <h1 class="page-title">Work</h1>
+  <div class="work-content">
+    <p>
+      Parallel Intent is a software studio building at the intersection of
+      human intent and machine intelligence.
+    </p>
+    <p>More coming soon.</p>
+  </div>
+</Page>
+
+<style>
+  .page-title {
+    font-family: "Instrument Serif", serif;
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    letter-spacing: -0.02em;
+    margin-bottom: 3rem;
+  }
+
+  .work-content {
+    font-size: 0.85rem;
+    line-height: 1.9;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+    max-width: 480px;
+  }
+
+  .work-content p + p {
+    margin-top: 1.5rem;
+  }
+</style>
