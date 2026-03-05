@@ -34,8 +34,20 @@ const { title } = Astro.props;
     <script>
       const toggleBtn = document.getElementById("themeToggle");
       const root = document.documentElement;
-      let isLight = false;
 
+      // Initialize from system preference
+      let isLight = window.matchMedia("(prefers-color-scheme: light)").matches;
+      root.classList.toggle("light", isLight);
+      if (toggleBtn) toggleBtn.textContent = isLight ? "◑ Dark" : "☀ Light";
+
+      // Listen for system changes
+      window.matchMedia("(prefers-color-scheme: light)").addEventListener("change", (e) => {
+        isLight = e.matches;
+        root.classList.toggle("light", isLight);
+        if (toggleBtn) toggleBtn.textContent = isLight ? "◑ Dark" : "☀ Light";
+      });
+
+      // Manual toggle
       toggleBtn?.addEventListener("click", () => {
         isLight = !isLight;
         root.classList.toggle("light", isLight);
