@@ -1,0 +1,107 @@
+---
+import Page from "../../layouts/Page.astro";
+import { getCollection, render } from "astro:content";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("writing");
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+---
+
+<Page title={post.data.title}>
+  <article class="post">
+    <header class="post-header">
+      <h1 class="post-title">{post.data.title}</h1>
+      <div class="post-meta">
+        {post.data.date.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+        · {post.data.status}
+        {post.data.tags.length > 0 && (
+          <span class="post-tags">
+            · {post.data.tags.join(", ")}
+          </span>
+        )}
+      </div>
+    </header>
+    <div class="prose">
+      <Content />
+    </div>
+  </article>
+</Page>
+
+<style>
+  .post-header {
+    margin-bottom: 3rem;
+  }
+
+  .post-title {
+    font-family: "Instrument Serif", serif;
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+
+  .post-meta {
+    margin-top: 1rem;
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .prose {
+    font-size: 0.85rem;
+    line-height: 1.9;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+  }
+
+  .prose :global(p + p) {
+    margin-top: 1.5rem;
+  }
+
+  .prose :global(a) {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .prose :global(h2) {
+    font-family: "Instrument Serif", serif;
+    font-size: 1.4rem;
+    color: var(--fg);
+    margin-top: 3rem;
+    margin-bottom: 1rem;
+  }
+
+  .prose :global(h3) {
+    font-size: 0.85rem;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--fg);
+    margin-top: 2rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .prose :global(code) {
+    font-family: "DM Mono", monospace;
+    font-size: 0.8rem;
+    background: var(--line);
+    padding: 0.15rem 0.4rem;
+    border-radius: 3px;
+  }
+
+  .prose :global(blockquote) {
+    border-left: 2px solid var(--accent);
+    padding-left: 1.2rem;
+    color: var(--muted);
+    font-style: italic;
+    margin: 1.5rem 0;
+  }
+</style>

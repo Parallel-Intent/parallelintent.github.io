@@ -1,0 +1,79 @@
+---
+import Base from "./Base.astro";
+import Nav from "../components/Nav.astro";
+
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<Base title={title}>
+  <main class="page">
+    <header class="page-header">
+      <a href="/" class="site-name">Parallel Intent</a>
+      <Nav />
+    </header>
+    <div class="page-content">
+      <slot />
+    </div>
+    <footer class="page-footer">
+      <span style="color: var(--accent)">v0.1</span> — seed · March 2026
+    </footer>
+  </main>
+</Base>
+
+<style is:global>
+  body:has(.page) {
+    overflow: auto;
+  }
+</style>
+
+<style>
+  .page {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 3rem;
+    z-index: 10;
+  }
+
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4rem;
+    opacity: 0;
+    animation: fadeUp 1s ease 0.2s forwards;
+  }
+
+  .site-name {
+    font-family: "Instrument Serif", serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.02em;
+    color: var(--fg);
+    text-decoration: none;
+  }
+
+  .page-content {
+    flex: 1;
+    max-width: 640px;
+    opacity: 0;
+    animation: fadeUp 1s ease 0.5s forwards;
+  }
+
+  .page-footer {
+    margin-top: 4rem;
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    opacity: 0;
+    animation: fadeUp 1s ease 0.8s forwards;
+  }
+
+  @media (max-width: 640px) {
+    .page { padding: 2rem; }
+  }
+</style>
