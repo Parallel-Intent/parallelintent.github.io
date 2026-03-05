@@ -1,0 +1,255 @@
+---
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title} — Parallel Intent</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="cursor" id="cursor"></div>
+    <div class="cursor-ring" id="cursorRing"></div>
+    <div class="grid"></div>
+    <div class="scanline"></div>
+    <div class="vertical-text">Building with intention — 2026</div>
+    <div class="number">41.3275° N / 19.8187° E</div>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+      ☀ Light
+    </button>
+
+    <slot />
+
+    <script>
+      const toggleBtn = document.getElementById("themeToggle");
+      const root = document.documentElement;
+      let isLight = false;
+
+      toggleBtn?.addEventListener("click", () => {
+        isLight = !isLight;
+        root.classList.toggle("light", isLight);
+        if (toggleBtn) toggleBtn.textContent = isLight ? "◑ Dark" : "☀ Light";
+      });
+
+      const cursor = document.getElementById("cursor");
+      const ring = document.getElementById("cursorRing");
+      let mx = 0, my = 0, rx = 0, ry = 0;
+
+      document.addEventListener("mousemove", (e) => {
+        mx = e.clientX;
+        my = e.clientY;
+        if (cursor) {
+          cursor.style.left = mx + "px";
+          cursor.style.top = my + "px";
+        }
+      });
+
+      function animateRing() {
+        rx += (mx - rx) * 0.12;
+        ry += (my - ry) * 0.12;
+        if (ring) {
+          ring.style.left = rx + "px";
+          ring.style.top = ry + "px";
+        }
+        requestAnimationFrame(animateRing);
+      }
+      animateRing();
+
+      document.querySelectorAll("a, .word").forEach((el) => {
+        el.addEventListener("mouseenter", () => {
+          if (ring) {
+            ring.style.width = "56px";
+            ring.style.height = "56px";
+            ring.style.borderColor = "var(--accent)";
+          }
+        });
+        el.addEventListener("mouseleave", () => {
+          if (ring) {
+            ring.style.width = "32px";
+            ring.style.height = "32px";
+            ring.style.borderColor = "var(--muted)";
+          }
+        });
+      });
+    </script>
+
+    <style is:global>
+      *, *::before, *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --bg: #0c0c0b;
+        --fg: #e8e4dc;
+        --muted: #5a5750;
+        --accent: #c8b89a;
+        --line: #1e1e1c;
+      }
+
+      :root.light {
+        --bg: #f5f2ec;
+        --fg: #1a1916;
+        --muted: #9a9690;
+        --accent: #7a5c3a;
+        --line: #e0dcd4;
+      }
+
+      html, body {
+        height: 100%;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--fg);
+        font-family: "DM Mono", monospace;
+        font-weight: 300;
+        overflow: hidden;
+        cursor: none;
+        transition: background 0.5s ease, color 0.5s ease;
+      }
+
+      .cursor {
+        position: fixed;
+        width: 6px;
+        height: 6px;
+        background: var(--accent);
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 9999;
+        transform: translate(-50%, -50%);
+        transition: transform 0.1s ease, opacity 0.3s ease;
+        mix-blend-mode: difference;
+      }
+
+      .cursor-ring {
+        position: fixed;
+        width: 32px;
+        height: 32px;
+        border: 1px solid var(--muted);
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 9998;
+        transform: translate(-50%, -50%);
+        transition: transform 0.25s ease, width 0.3s ease, height 0.3s ease, opacity 0.3s ease;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+        pointer-events: none;
+        z-index: 100;
+        opacity: 0.35;
+      }
+
+      .grid {
+        position: fixed;
+        inset: 0;
+        background-image:
+          linear-gradient(var(--line) 1px, transparent 1px),
+          linear-gradient(90deg, var(--line) 1px, transparent 1px);
+        background-size: 80px 80px;
+        pointer-events: none;
+        opacity: 0.5;
+      }
+
+      .scanline {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--accent), transparent);
+        opacity: 0.15;
+        animation: scan 8s linear infinite;
+        pointer-events: none;
+        z-index: 50;
+      }
+
+      .vertical-text {
+        position: fixed;
+        right: 3rem;
+        top: 50%;
+        transform: translateY(-50%) rotate(90deg);
+        font-size: 0.58rem;
+        letter-spacing: 0.25em;
+        text-transform: uppercase;
+        color: var(--muted);
+        opacity: 0.4;
+        white-space: nowrap;
+        pointer-events: none;
+      }
+
+      .number {
+        position: fixed;
+        left: 3rem;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 0.58rem;
+        letter-spacing: 0.2em;
+        color: var(--muted);
+        opacity: 0.3;
+        writing-mode: vertical-rl;
+        text-orientation: mixed;
+        pointer-events: none;
+      }
+
+      .theme-toggle {
+        position: fixed;
+        top: 2.8rem;
+        right: 3rem;
+        z-index: 200;
+        background: none;
+        border: 1px solid var(--muted);
+        color: var(--muted);
+        font-family: "DM Mono", monospace;
+        font-size: 0.58rem;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        padding: 0.4rem 0.8rem;
+        cursor: none;
+        transition: color 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+        opacity: 0;
+        animation: fadeUp 1s ease 1.6s forwards;
+      }
+
+      .theme-toggle:hover {
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+
+      @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(16px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.3; }
+      }
+
+      @keyframes scan {
+        0% { top: -2px; }
+        100% { top: 100vh; }
+      }
+
+      @media (max-width: 640px) {
+        .vertical-text, .number { display: none; }
+      }
+    </style>
+  </body>
+</html>
