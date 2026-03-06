@@ -13,21 +13,18 @@ const { title } = Astro.props;
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title} — Parallel Intent</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=IBM+Plex+Mono:wght@300;400&display=swap"
       rel="stylesheet"
     />
   </head>
   <body>
     <div class="cursor" id="cursor"></div>
-    <div class="cursor-ring" id="cursorRing"></div>
-    <div class="grid"></div>
+    <div class="grain"></div>
+    <div class="grid-dots"></div>
     <div class="scanline"></div>
-    <div class="vertical-text">Building with intention — 2026</div>
-    <div class="number">41.3275° N / 19.8187° E</div>
-    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
-      ☀ Light
-    </button>
+    <div class="vertical-text">41.3275° N / 19.8187° E</div>
 
     <slot />
 
@@ -35,65 +32,30 @@ const { title } = Astro.props;
       const toggleBtn = document.getElementById("themeToggle");
       const root = document.documentElement;
 
-      // Initialize from system preference
       let isLight = window.matchMedia("(prefers-color-scheme: light)").matches;
       root.classList.toggle("light", isLight);
-      if (toggleBtn) toggleBtn.textContent = isLight ? "◑ Dark" : "☀ Light";
+      if (toggleBtn) toggleBtn.textContent = isLight ? "Dark" : "Light";
 
-      // Listen for system changes
       window.matchMedia("(prefers-color-scheme: light)").addEventListener("change", (e) => {
         isLight = e.matches;
         root.classList.toggle("light", isLight);
-        if (toggleBtn) toggleBtn.textContent = isLight ? "◑ Dark" : "☀ Light";
+        if (toggleBtn) toggleBtn.textContent = isLight ? "Dark" : "Light";
       });
 
-      // Manual toggle
       toggleBtn?.addEventListener("click", () => {
         isLight = !isLight;
         root.classList.toggle("light", isLight);
-        if (toggleBtn) toggleBtn.textContent = isLight ? "◑ Dark" : "☀ Light";
+        if (toggleBtn) toggleBtn.textContent = isLight ? "Dark" : "Light";
       });
 
+      // Custom cursor
       const cursor = document.getElementById("cursor");
-      const ring = document.getElementById("cursorRing");
-      let mx = 0, my = 0, rx = 0, ry = 0;
-
-      document.addEventListener("mousemove", (e) => {
-        mx = e.clientX;
-        my = e.clientY;
-        if (cursor) {
-          cursor.style.left = mx + "px";
-          cursor.style.top = my + "px";
-        }
-      });
-
-      function animateRing() {
-        rx += (mx - rx) * 0.12;
-        ry += (my - ry) * 0.12;
-        if (ring) {
-          ring.style.left = rx + "px";
-          ring.style.top = ry + "px";
-        }
-        requestAnimationFrame(animateRing);
+      if (cursor) {
+        document.addEventListener("mousemove", (e) => {
+          cursor.style.left = e.clientX + "px";
+          cursor.style.top = e.clientY + "px";
+        });
       }
-      animateRing();
-
-      document.querySelectorAll("a, .word").forEach((el) => {
-        el.addEventListener("mouseenter", () => {
-          if (ring) {
-            ring.style.width = "56px";
-            ring.style.height = "56px";
-            ring.style.borderColor = "var(--accent)";
-          }
-        });
-        el.addEventListener("mouseleave", () => {
-          if (ring) {
-            ring.style.width = "32px";
-            ring.style.height = "32px";
-            ring.style.borderColor = "var(--muted)";
-          }
-        });
-      });
     </script>
 
     <style is:global>
@@ -104,19 +66,19 @@ const { title } = Astro.props;
       }
 
       :root {
-        --bg: #0c0c0b;
-        --fg: #e8e4dc;
-        --muted: #5a5750;
-        --accent: #c8b89a;
-        --line: #1e1e1c;
+        --bg: #060608;
+        --fg: #e4e4e7;
+        --muted: #52525b;
+        --accent: #a1a1aa;
+        --line: #18181b;
       }
 
       :root.light {
-        --bg: #f5f2ec;
-        --fg: #1a1916;
-        --muted: #9a9690;
-        --accent: #7a5c3a;
-        --line: #e0dcd4;
+        --bg: #fafafa;
+        --fg: #09090b;
+        --muted: #a1a1aa;
+        --accent: #52525b;
+        --line: #e4e4e7;
       }
 
       html, body {
@@ -126,126 +88,109 @@ const { title } = Astro.props;
       body {
         background: var(--bg);
         color: var(--fg);
-        font-family: "DM Mono", monospace;
+        font-family: "IBM Plex Mono", monospace;
         font-weight: 300;
         overflow: hidden;
         cursor: none;
-        transition: background 0.5s ease, color 0.5s ease;
+        transition: background 0.4s ease, color 0.4s ease;
       }
 
+      a {
+        color: inherit;
+      }
+
+      /* Cursor */
       .cursor {
         position: fixed;
-        width: 6px;
-        height: 6px;
+        width: 7px;
+        height: 7px;
         background: var(--accent);
         border-radius: 50%;
         pointer-events: none;
         z-index: 9999;
         transform: translate(-50%, -50%);
-        transition: transform 0.1s ease, opacity 0.3s ease;
-        mix-blend-mode: difference;
+        box-shadow: 0 0 10px color-mix(in srgb, var(--accent) 40%, transparent);
       }
 
-      .cursor-ring {
-        position: fixed;
-        width: 32px;
-        height: 32px;
-        border: 1px solid var(--muted);
-        border-radius: 50%;
-        pointer-events: none;
-        z-index: 9998;
-        transform: translate(-50%, -50%);
-        transition: transform 0.25s ease, width 0.3s ease, height 0.3s ease, opacity 0.3s ease;
-      }
-
-      body::before {
-        content: "";
+      /* Grain texture */
+      .grain {
         position: fixed;
         inset: 0;
-        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
         pointer-events: none;
         z-index: 100;
-        opacity: 0.35;
+        opacity: 0.3;
       }
 
-      .grid {
+      /* Dot grid */
+      .grid-dots {
         position: fixed;
         inset: 0;
-        background-image:
-          linear-gradient(var(--line) 1px, transparent 1px),
-          linear-gradient(90deg, var(--line) 1px, transparent 1px);
-        background-size: 80px 80px;
+        background-image: radial-gradient(circle, var(--muted) 0.5px, transparent 0.5px);
+        background-size: 40px 40px;
         pointer-events: none;
-        opacity: 0.5;
+        opacity: 0.15;
       }
 
+      /* Scanline */
       .scanline {
         position: fixed;
         top: 0;
         left: 0;
         right: 0;
-        height: 2px;
-        background: linear-gradient(90deg, transparent, var(--accent), transparent);
-        opacity: 0.15;
-        animation: scan 8s linear infinite;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--fg), transparent);
+        opacity: 0.06;
+        animation: scan 10s linear infinite;
         pointer-events: none;
         z-index: 50;
       }
 
+      /* Vertical text */
       .vertical-text {
         position: fixed;
         right: 3rem;
         top: 50%;
         transform: translateY(-50%) rotate(90deg);
-        font-size: 0.58rem;
-        letter-spacing: 0.25em;
-        text-transform: uppercase;
-        color: var(--muted);
-        opacity: 0.4;
-        white-space: nowrap;
-        pointer-events: none;
-      }
-
-      .number {
-        position: fixed;
-        left: 3rem;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 0.58rem;
+        font-size: 0.55rem;
         letter-spacing: 0.2em;
         color: var(--muted);
-        opacity: 0.3;
-        writing-mode: vertical-rl;
-        text-orientation: mixed;
+        opacity: 0.25;
+        white-space: nowrap;
         pointer-events: none;
       }
 
       .theme-toggle {
         position: fixed;
-        top: 2.8rem;
+        top: 3rem;
         right: 3rem;
         z-index: 200;
         background: none;
-        border: 1px solid var(--muted);
+        border: none;
         color: var(--muted);
-        font-family: "DM Mono", monospace;
-        font-size: 0.58rem;
-        letter-spacing: 0.15em;
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.65rem;
+        font-weight: 300;
+        letter-spacing: 0.12em;
         text-transform: uppercase;
-        padding: 0.4rem 0.8rem;
-        cursor: none;
-        transition: color 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+        padding: 0;
+        cursor: pointer;
+        transition: color 0.3s ease;
         opacity: 0;
-        animation: fadeUp 1s ease 1.6s forwards;
+        animation: fadeIn 0.8s ease 1.6s forwards;
       }
 
       .theme-toggle:hover {
-        color: var(--accent);
-        border-color: var(--accent);
+        color: var(--fg);
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
       }
 
       @keyframes fadeUp {
-        from { opacity: 0; transform: translateY(16px); }
+        from { opacity: 0; transform: translateY(12px); }
         to { opacity: 1; transform: translateY(0); }
       }
 
@@ -255,12 +200,16 @@ const { title } = Astro.props;
       }
 
       @keyframes scan {
-        0% { top: -2px; }
+        0% { top: -1px; }
         100% { top: 100vh; }
       }
 
       @media (max-width: 640px) {
-        .vertical-text, .number { display: none; }
+        .vertical-text { display: none; }
+        .theme-toggle {
+          top: 2rem;
+          right: 2rem;
+        }
       }
     </style>
   </body>

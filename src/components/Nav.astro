@@ -21,30 +21,14 @@ const links = [
 
   .nav-links a {
     font-size: 0.65rem;
-    letter-spacing: 0.15em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--muted);
     text-decoration: none;
     transition: color 0.3s ease;
-    position: relative;
-  }
-
-  .nav-links a::after {
-    content: "";
-    position: absolute;
-    bottom: -2px;
-    left: 0;
-    width: 0;
-    height: 1px;
-    background: var(--accent);
-    transition: width 0.3s ease;
   }
 
   .nav-links a:hover {
-    color: var(--accent);
-  }
-
-  .nav-links a:hover::after {
-    width: 100%;
+    color: var(--fg);
   }
 </style>
