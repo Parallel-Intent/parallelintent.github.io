@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/Parallel-Intent/parallelintent.github.io#readme",
   "dependencies": {
+    "@astrojs/rss": "^4.0.15",
     "astro": "^5.18.0"
   }
 }
