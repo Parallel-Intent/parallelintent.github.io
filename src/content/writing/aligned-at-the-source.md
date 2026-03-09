@@ -8,6 +8,4 @@ description: "Human intent and machine intelligence, committed together."
 
 The next era of software isn't built by humans or machines. It's built by both, in parallel, toward the same goal.
 
-Parallel Intent exists at that intersection. Where intent is the input. Where alignment is the architecture. Where every commit moves in one direction.
-
-Not faster tools. A new way of building.
+Parallel Intent exists at that intersection.
